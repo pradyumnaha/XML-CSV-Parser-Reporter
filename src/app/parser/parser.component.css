@@ -1,0 +1,37 @@
+.fileSelect{
+    height: 80px;
+}
+
+.btnChooseFile, .btnProcess, .btnReset, .tableBody{
+    background-color: #f56b11;
+    color: #f9f9fa;
+}
+
+/* .tableBody{
+    background-color: #f56b11;
+    background-color: #f7a26b;
+    color: black;
+}*/
+
+.tableHeader{
+    background-color: #12129b;
+    color: #f9f9fa;
+}
+
+.footerBottom {
+    padding-top: 10px;
+    padding-bottom: 0px;
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background-color: #f56b11;
+    
+  }
+
+.footerBody{
+    color: #f9f9fa;
+}
+
+.userInformation{
+    margin: 90px !important;
+}
