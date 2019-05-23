@@ -2,7 +2,7 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.7.
 
-##Steps to run the application
+## Steps to run the application
 Clone the repository
 In the root folder run `npm install` to download all the required modules
 
@@ -30,16 +30,15 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
 
-##Folder structure
 
-##How to use the application
+## How to use the application
 1. Select a CSV/XML file using choose file button.
 2. Once the CSV/XML file is loaded successfully, the data file will be displayed in a tabular column.
 3. Click on Process button to process the records.
 4. If the records get successfully processed, you get success alert.
 5. If the records gets failed (a record is considered as 'failed' if end balance is not calculated properly or if the transaction reference is not unique), you get failure alert along with a CSV file which contains the     failed records.
 
-##Required file format
+## Required file format
 .csv format:
 Reference,AccountNumber,Description,Start Balance,Mutation,End Balance
 194261,NL91RABO0315273637,Clothes from Jan Bakker,21.6,-41.83,-20.23
