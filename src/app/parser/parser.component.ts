@@ -10,49 +10,52 @@ import { NgxXml2jsonService } from 'ngx-xml2json';
 })
 export class ParserComponent implements OnInit {
   
-  @ViewChild('fileImportInput')
-  fileImportInput: any;
-  csvRecords = [];
-  csvRows = [];
-  csvWriteData;
+  @ViewChild('fileLoadInput')
+  fileLoadInput: any;
+  dataRecords = [];
+  dataRows = [];
+  csvWriteDataRpt;
   failedRec = [];
   headersRow = [];
-  csvDataWithoutHeader = []
+  dataWithoutHeader = []
   displayUserInfo: boolean = true;
+  supportedFileFormat: boolean = true;
   modalTitle: string = "";
   modalBody: string = "";
-  Arr:string | ArrayBuffer = "";
+  arrFrmXml:string | ArrayBuffer = "";
 
   constructor(private parseUtil: ParserUtil, private ngxXml2jsonService: NgxXml2jsonService ) {
   }
 
   ngOnInit() {
     document.getElementById('processRec').style.display = 'none';
+    document.getElementById('successAlert').style.display = 'none';
+    document.getElementById('failureAlert').style.display = 'none';
     this.displayUserInfo = true;
    }
 
   fileChangeListener($event): void {
+    console.log($event);
     this.displayUserInfo = false;
-
-    var text = [];
     var target = $event.target || $event.srcElement;
-    var files = target.files; 
-    
+    var files = target.files;   
 
-    if(Constants.validateHeaderAndRecordLengthFlag){
-      
-      if (this.parseUtil.isCSVFile(files[0])) {
+    if(Constants.valildateFileExtenstionFlag){      
+      if (this.parseUtil.isFileExtCsv(files[0])) {
         this.parseCsv($event);
+        this.supportedFileFormat = true;
+        document.getElementById('successAlert').style.display = 'none';
+        document.getElementById('failureAlert').style.display = 'none';
       }
-      else if (this.parseUtil.isXMLFile(files[0])) {
+      else if (this.parseUtil.isFileExtXml(files[0])) {
         this.parseXml($event);
+        this.supportedFileFormat = true;
+        document.getElementById('successAlert').style.display = 'none';
+        document.getElementById('failureAlert').style.display = 'none';
       }
       else{
-        alert("Please import valid .csv/.xml file.");
-        this.fileReset();
-      }
-
-      
+        this.supportedFileFormat = false;
+      }  
     }
   }
 
@@ -64,19 +67,17 @@ export class ParserComponent implements OnInit {
 
     reader.onload = (data) => {
       let csvData = (reader.result).toString();
-      console.log(csvData);
       let csvRecordsArray = csvData.split(/\r\n|\n/);
 
       if(Constants.isHeaderPresentFlag){
-        this.headersRow = this.parseUtil.getHeaderArray(csvRecordsArray, Constants.tokenDelimeter); 
+        this.headersRow = this.parseUtil.getHeaderArr(csvRecordsArray, Constants.delimeter); 
       }
       
-      this.csvRecords = this.parseUtil.getDataRecordsArrayFromCSVFile(csvRecordsArray, Constants.tokenDelimeter);
-      this.csvRecords.pop();
-      console.log(this.csvRecords);
-      this.csvDataWithoutHeader = this.csvRecords.slice();
-      this.csvDataWithoutHeader.shift();
-      if(this.csvRecords == null){
+      this.dataRecords = this.parseUtil.getRecordsArrFrmCsvFile(csvRecordsArray, Constants.delimeter);
+      this.dataRecords.pop();
+      this.dataWithoutHeader = this.dataRecords.slice();
+      this.dataWithoutHeader.shift();
+      if(this.dataRecords == null){
         this.fileReset();
       }    
     }
@@ -95,9 +96,9 @@ export class ParserComponent implements OnInit {
     for (var index = 0; index < input.files.length; index++) {
         let reader = new FileReader();
         reader.onload = () => {
-            this.Arr = reader.result;
+            this.arrFrmXml = reader.result;
             const parser = new DOMParser();
-            const xml = parser.parseFromString(this.Arr.toString(), 'text/xml');
+            const xml = parser.parseFromString(this.arrFrmXml.toString(), 'text/xml');
             obj = this.ngxXml2jsonService.xmlToJson(xml);
             obj.records.record.forEach(element => {
               manipulatedCsvObj = {
@@ -111,89 +112,66 @@ export class ParserComponent implements OnInit {
               manipulatedCsvArray.push(manipulatedCsvObj);
             });
 
-            this.csvDataWithoutHeader = manipulatedCsvArray.map( Object.values );
+            this.dataWithoutHeader = manipulatedCsvArray.map( Object.values );
             if(this.headersRow.length === 0){
               for(var key in manipulatedCsvArray[0]){
-                this.headersRow.push(key);
-                
-                
+                this.headersRow.push(key);                        
               }
             }
-            this.csvRecords = [this.headersRow, ...this.csvDataWithoutHeader]; 
-            console.log(this.headersRow);
-            console.log(this.csvDataWithoutHeader);
-            console.log(this.csvRecords);          
+            this.dataRecords = [this.headersRow, ...this.dataWithoutHeader];        
         }
         reader.readAsText(input.files[index]);
-    };
-    
+    };   
    
-    if(this.csvRecords == null){
+    if(this.dataRecords == null){
       this.fileReset();
     }
   }
 
   fileReset(){
-    this.fileImportInput.nativeElement.value = "";
+    this.fileLoadInput.nativeElement.value = "";
+    this.supportedFileFormat = true;
     this.displayUserInfo = true;
-    this.csvRecords= [];
+    this.dataRecords= [];
     this.headersRow= [];
-    this.csvRows= []; 
-    this.csvWriteData= [];
+    this.dataRows= []; 
+    this.csvWriteDataRpt= [];
     this.failedRec = [];
-    this.csvDataWithoutHeader = [];
+    this.dataWithoutHeader = [];
     document.getElementById('processRec').style.display = 'none';
+    document.getElementById('successAlert').style.display = 'none';
+    document.getElementById('failureAlert').style.display = 'none';
   }
 
   fileProcess(){ 
     const failedArr1 = [];
     const failedArr2 = [];
 
-    for(let i=1; i < this.csvRecords.length; i++){
-      let arr = this.csvRecords[i];
+    for(let i=1; i < this.dataRecords.length; i++){
+      let arr = this.dataRecords[i];
       let endVal;
       let endBal = Number(arr[arr.length-1]);
       let mutation = Number(arr[arr.length-2]);
       let startBal = Number(arr[arr.length-3]);
       endVal = startBal + mutation;
       endVal = (Math.round(endVal * 100) / 100);
-      console.log(endVal);
-      console.log(endBal);
       if(endBal != endVal){
         failedArr1.push(arr);        
       }  
     }
-    console.log(failedArr1);
-    // for(let i=0; i < this.csvRecords.length; i++){
-    //   let arr1 = this.csvRecords[i];
-    //   if (i==0){
-    //     this.failedRec2.push(arr1);
-    //     continue;
-    //   }       
-        
-    //   //prevVal = arr1[0];
-    //   for(let j=i+1; j<this.csvRecords.length; j++){
-    //     let arr2 = this.csvRecords[j];
-        
-    //     if(arr1[0] === arr2[0]){
-    //       this.failedRec2.push(arr2);
-    //       break;        
-    //     }  
-    //   }
-    // }
 
-    for(let i=0; i < this.csvRecords.length; i++){
-      let arr1 = this.csvRecords[i];
+    for(let i=0; i < this.dataRecords.length; i++){
+      let arr1 = this.dataRecords[i];
       if (i==0){
         failedArr2.push(arr1);
         continue;
       }       
         
-      for(let j=0; j<this.csvRecords.length; j++){
+      for(let j=0; j<this.dataRecords.length; j++){
         if(i==j || j==0){
           continue;
         }
-        let arr2 = this.csvRecords[j];
+        let arr2 = this.dataRecords[j];
         
         if(arr1[0] === arr2[0]){
           failedArr2.push(arr1);
@@ -205,30 +183,37 @@ export class ParserComponent implements OnInit {
     const filteredFailedArrays = failedArrays.filter(function (item, pos) {return failedArrays.indexOf(item) == pos});
 
     if(filteredFailedArrays.length > 1){
+      this.dataWithoutHeader = filteredFailedArrays;
+      this.dataWithoutHeader.shift();
       filteredFailedArrays.forEach(el => {
-        this.csvRows.push(el.join(','));
+        this.dataRows.push(el.join(','));
       });
-      console.log(this.csvRows.join('\n'));
-      this.downloadRpt(this.csvRows.join('\n'));
+      this.downloadRpt(this.dataRows.join('\n'));
+      document.getElementById('failureAlert').style.display = 'block';
       this.modalTitle = "Info: Process Failure";
-      this.modalBody = "CSV file process failed. There are few records in the file which either does not have unique Reference or contains negative End balance. Please check the report (ProcessFailure.csv).";
+      this.modalBody = "File process failed. There are few records in the file which either does not have unique Reference or End balance is not calculated properly. Please check the report (FailedRecordsReport.csv).";
     }
     else{
+      document.getElementById('successAlert').style.display = 'block';
       this.modalTitle = "Info: Process Success";
-      this.modalBody = "CSV file process successfully. No failed records found.";
+      this.modalBody = "File processed successfully. No failed records found.";
     }  
     document.getElementById('processRec').style.display = 'none';
   }
 
   downloadRpt(data){
-    this.csvWriteData = data;
-    const blob = new Blob([this.csvWriteData], {type: 'text/csv'});
+    this.csvWriteDataRpt = data;
+    let today = new Date();
+    let date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
+    let time = `${today.getHours()}-${today.getMinutes()}-${today.getSeconds()}`;
+    let dateTime = `${date}_${time}`;
+    const blob = new Blob([this.csvWriteDataRpt], {type: 'text/csv'});
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     
     a.setAttribute('hidden', '');
     a.setAttribute('href', url);
-    a.setAttribute('download', `ProcessFailure.csv`);
+    a.setAttribute('download', `FailedRecordsReport_${dateTime}.csv`);
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
