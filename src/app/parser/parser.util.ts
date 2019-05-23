@@ -23,7 +23,7 @@ export class ParserUtil {
     }
 
     getRecordsArrFrmCsvFile(csvRecordsArray, delimeter) {
-        var dataArr = [];
+        const dataArr = [];
         for (let i = 0; i < csvRecordsArray.length; i++) {
             let data = csvRecordsArray[i].split(delimeter);
             let col = [];

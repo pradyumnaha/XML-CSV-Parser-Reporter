@@ -5,7 +5,6 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { ParserComponent } from './parser/parser.component';
 import { ParserUtil } from './parser/parser.util';
-import { Constants } from './parser/parser.constants';
 
 
 @NgModule({
@@ -17,7 +16,7 @@ import { Constants } from './parser/parser.constants';
   imports: [
     BrowserModule
   ],
-  providers: [Constants, ParserUtil],
+  providers: [ParserUtil],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { ParserUtil } from './parser.util';
-import { Constants } from './parser.constants';
 import { NgxXml2jsonService } from 'ngx-xml2json';
 
 @Component({
@@ -15,7 +14,6 @@ export class ParserComponent implements OnInit {
   dataRecords = [];
   dataRows = [];
   csvWriteDataRpt;
-  failedRec = [];
   headersRow = [];
   dataWithoutHeader = []
   displayUserInfo: boolean = true;
@@ -23,57 +21,45 @@ export class ParserComponent implements OnInit {
   modalTitle: string = "";
   modalBody: string = "";
   arrFrmXml:string | ArrayBuffer = "";
+  successProcess: boolean = false;
+  failureProcess: boolean = false;
+  processBtn: boolean = false;
 
   constructor(private parseUtil: ParserUtil, private ngxXml2jsonService: NgxXml2jsonService ) {
   }
 
-  ngOnInit() {
-    document.getElementById('processRec').style.display = 'none';
-    document.getElementById('successAlert').style.display = 'none';
-    document.getElementById('failureAlert').style.display = 'none';
-    this.displayUserInfo = true;
-   }
+  ngOnInit() {}
 
   fileChangeListener($event): void {
-    console.log($event);
     this.displayUserInfo = false;
-    var target = $event.target || $event.srcElement;
-    var files = target.files;   
-
-    if(Constants.valildateFileExtenstionFlag){      
-      if (this.parseUtil.isFileExtCsv(files[0])) {
-        this.parseCsv($event);
-        this.supportedFileFormat = true;
-        document.getElementById('successAlert').style.display = 'none';
-        document.getElementById('failureAlert').style.display = 'none';
-      }
-      else if (this.parseUtil.isFileExtXml(files[0])) {
-        this.parseXml($event);
-        this.supportedFileFormat = true;
-        document.getElementById('successAlert').style.display = 'none';
-        document.getElementById('failureAlert').style.display = 'none';
-      }
-      else{
-        this.supportedFileFormat = false;
-      }  
-    }
+    const files = $event.target.files || $event.srcElement.files;   
+    if (this.parseUtil.isFileExtCsv(files[0])) {
+      this.parseCsv($event);
+      this.supportedFileFormat = true;
+      this.successProcess = false;
+      this.failureProcess = false;
+    } else if (this.parseUtil.isFileExtXml(files[0])) {
+      this.parseXml($event);
+      this.supportedFileFormat = true;
+      this.successProcess = false;
+      this.failureProcess = false;
+    } else{
+      this.supportedFileFormat = false;
+    }  
   }
 
   parseCsv($event){
-    document.getElementById('processRec').style.display = 'block';
-    var input = $event.target;
-    var reader = new FileReader();
+    this.processBtn = true;
+    const input = $event.target;
+    const reader = new FileReader();
     reader.readAsText(input.files[0]);
 
-    reader.onload = (data) => {
+    reader.onload = () => {
       let csvData = (reader.result).toString();
       let csvRecordsArray = csvData.split(/\r\n|\n/);
-
-      if(Constants.isHeaderPresentFlag){
-        this.headersRow = this.parseUtil.getHeaderArr(csvRecordsArray, Constants.delimeter); 
-      }
+      this.headersRow = this.parseUtil.getHeaderArr(csvRecordsArray, ','); 
       
-      this.dataRecords = this.parseUtil.getRecordsArrFrmCsvFile(csvRecordsArray, Constants.delimeter);
+      this.dataRecords = this.parseUtil.getRecordsArrFrmCsvFile(csvRecordsArray, ',');
       this.dataRecords.pop();
       this.dataWithoutHeader = this.dataRecords.slice();
       this.dataWithoutHeader.shift();
@@ -82,18 +68,18 @@ export class ParserComponent implements OnInit {
       }    
     }
 
-    reader.onerror = function () {
+    reader.onerror = () => {
       alert('Unable to read ' + input.files[0]);
     };
   }
 
   parseXml($event) {
-    document.getElementById('processRec').style.display = 'block';
+    this.processBtn = true;
     let input = $event.target;
     let obj;
     let manipulatedCsvObj;
     let manipulatedCsvArray = [];
-    for (var index = 0; index < input.files.length; index++) {
+    for (let index = 0; index < input.files.length; index++) {
         let reader = new FileReader();
         reader.onload = () => {
             this.arrFrmXml = reader.result;
@@ -114,7 +100,7 @@ export class ParserComponent implements OnInit {
 
             this.dataWithoutHeader = manipulatedCsvArray.map( Object.values );
             if(this.headersRow.length === 0){
-              for(var key in manipulatedCsvArray[0]){
+              for(let key in manipulatedCsvArray[0]){
                 this.headersRow.push(key);                        
               }
             }
@@ -136,17 +122,15 @@ export class ParserComponent implements OnInit {
     this.headersRow= [];
     this.dataRows= []; 
     this.csvWriteDataRpt= [];
-    this.failedRec = [];
     this.dataWithoutHeader = [];
-    document.getElementById('processRec').style.display = 'none';
-    document.getElementById('successAlert').style.display = 'none';
-    document.getElementById('failureAlert').style.display = 'none';
+    this.successProcess = false;
+    this.failureProcess = false;
+    this.processBtn = false;
   }
 
   fileProcess(){ 
     const failedArr1 = [];
     const failedArr2 = [];
-
     for(let i=1; i < this.dataRecords.length; i++){
       let arr = this.dataRecords[i];
       let endVal;
@@ -183,26 +167,28 @@ export class ParserComponent implements OnInit {
     const filteredFailedArrays = failedArrays.filter(function (item, pos) {return failedArrays.indexOf(item) == pos});
 
     if(filteredFailedArrays.length > 1){
-      this.dataWithoutHeader = filteredFailedArrays;
+      this.failureProcess = true;
+      this.dataWithoutHeader = filteredFailedArrays.slice();
       this.dataWithoutHeader.shift();
+      this.dataRows = [];
       filteredFailedArrays.forEach(el => {
         this.dataRows.push(el.join(','));
       });
       this.downloadRpt(this.dataRows.join('\n'));
-      document.getElementById('failureAlert').style.display = 'block';
+      this.failureProcess = true;
       this.modalTitle = "Info: Process Failure";
       this.modalBody = "File process failed. There are few records in the file which either does not have unique Reference or End balance is not calculated properly. Please check the report (FailedRecordsReport.csv).";
     }
     else{
-      document.getElementById('successAlert').style.display = 'block';
+      this.successProcess = true;
       this.modalTitle = "Info: Process Success";
       this.modalBody = "File processed successfully. No failed records found.";
-    }  
-    document.getElementById('processRec').style.display = 'none';
+    }
+    this.processBtn = false;
   }
 
   downloadRpt(data){
-    this.csvWriteDataRpt = data;
+    this.csvWriteDataRpt = data.slice();
     let today = new Date();
     let date = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`;
     let time = `${today.getHours()}-${today.getMinutes()}-${today.getSeconds()}`;
