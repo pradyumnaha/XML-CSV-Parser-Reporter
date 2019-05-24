@@ -3,7 +3,7 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.7.
 
 ## Steps to run the application
-Clone the repository. In the root folder run `npm install` to download all the required modules
+Clone the repository. In the root folder run `npm install` to install all the required modules
 
 ## Development server
 
