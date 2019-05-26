@@ -154,48 +154,6 @@ describe('ParserComponent', () => {
     expect(component.failureProcess).toBe(true);
   });
 
-  it('filechangelistener when there is a CSV file uploaded', () => {
-    const fileReaderSpy = jasmine.createSpyObj('FileReader', ['onload', 'readAsText']);
-    const event = {
-      target: {
-        files: {
-          0: {
-            name: "records.csv"
-          }
-        }
-      }
-    }
-    spyOn(window, 'FileReader').and.returnValue(fileReaderSpy);
-    component.fileChangeListener(event);
-    const parserUtil = fixture.debugElement.injector.get(ParserUtil);
-    const retValCsv = parserUtil.isFileExtCsv(event.target.files[0]);
-    const retValXml = parserUtil.isFileExtXml(event.target.files[0]);
-    expect(retValCsv).toBe(true);
-    expect(retValXml).toBe(false);
-    expect(component.supportedFileFormat).toBe(true);
-  });
-
-  it('filechangelistener when there is a XML file uploaded', () => {
-    const fileReaderSpy = jasmine.createSpyObj('FileReader', ['onload', 'readAsText']);
-    const event = {
-      target: {
-        files: {
-          0: {
-            name: "records.xml"
-          }
-        }
-      }
-    }
-    spyOn(window, 'FileReader').and.returnValue(fileReaderSpy);
-    component.fileChangeListener(event);
-    const parserUtil = fixture.debugElement.injector.get(ParserUtil);
-    const retValCsv = parserUtil.isFileExtCsv(event.target.files[0]);
-    const retValXml = parserUtil.isFileExtXml(event.target.files[0]);
-    expect(retValCsv).toBe(false);
-    expect(retValXml).toBe(true);
-    expect(component.supportedFileFormat).toBe(true);
-  });
-
   it('filechangelistener when there is a wrong file format', () => {
     const event = {
       target: {

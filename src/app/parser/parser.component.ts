@@ -34,10 +34,10 @@ export class ParserComponent implements OnInit {
     this.displayUserInfo = false;
     const files = $event.target.files || $event.srcElement.files;   
     if (this.parseUtil.isFileExtCsv(files[0])) {
-      this.parseCsv($event);
       this.supportedFileFormat = true;
       this.successProcess = false;
       this.failureProcess = false;
+      this.parseCsv($event);
     } else if (this.parseUtil.isFileExtXml(files[0])) {
       this.parseXml($event);
       this.supportedFileFormat = true;
