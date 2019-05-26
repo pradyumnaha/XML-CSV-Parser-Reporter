@@ -2,33 +2,32 @@
     height: 80px;
 }
 
-.btnChooseFile, .btnProcess, .btnReset, .tableBody{
+.btnReset, .tableBody{
     background-color: #f56b11;
     color: #f9f9fa;
 }
 
-/* .tableBody{
-    background-color: #f56b11;
-    background-color: #f7a26b;
-    color: black;
-}*/
+.btnProcess {
+    background-color: #12129b;
+    color: white;
+}
+
+input {
+    border-radius: 0 !important;
+}
+
+.btnChooseFile {
+    height: 40px;
+    padding: 4px 0 0 15px;
+}
+
+.user-image {
+    display: block;
+    width: 100px;
+}
 
 .tableHeader{
     background-color: #12129b;
-    color: #f9f9fa;
-}
-
-.footerBottom {
-    padding-top: 10px;
-    padding-bottom: 0px;
-    position:fixed;
-    bottom:0;
-    width:100%;
-    background-color: #f56b11;
-    
-  }
-
-.footerBody{
     color: #f9f9fa;
 }
 
@@ -38,4 +37,10 @@
 
 .unsupported{
     color: red;
+}
+
+@media (max-width:767px) {
+    .user-image {
+        display: none;
+    }
 }

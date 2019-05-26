@@ -1,19 +1,16 @@
-<div class="bg-light d-flex align-items-center fileSelect">
-    <div class="col-sm-12">
-        <table class="d-flex justify-content-center">
-            <tr>
-                <td>
-                    <input type="file" #fileLoadInput name="File Upload" id="txtFileUpload" class="btn btnChooseFile" (change)="fileChangeListener($event)" accept=".csv,.xml" value={{selectedImageFile}}/>
-                </td>
-                <td>
-                    <input type="button" name="Reset" id="txtFileReset" class="btn btnReset ml-2" (click)="fileReset()" value="Reset" />
-                </td>
-                <td>
-                    <input type="button" name="Process" *ngIf="processBtn" class="btn btnProcess ml-2" (click)="fileProcess()" value="Process" data-toggle="modal" data-target="#exampleModalCenter" />
-                </td>
-            </tr>
-        </table>
-        <small class="d-flex justify-content-center unsupported" *ngIf="!supportedFileFormat">Unsupported file format</small>
+<div class="container-fluid">
+    <div class="row bg-light mb-4">
+        <div class="offset-lg-4 offset-md-3 col-lg-4 col-md-6 col-sm-6">
+            <div class="input-group p-3">
+                <input type="file" #fileLoadInput name="File Upload" id="txtFileUpload" class="form-control pb-4 btnChooseFile" (change)="fileChangeListener($event)" accept=".csv,.xml" value={{selectedImageFile}}/>
+                <div class="input-group-append">
+                    <button type="button" class="btn btnReset" (click)="fileReset()"><i class="fas fa-redo"></i> Reset</button>
+                    <button type="button" *ngIf="processBtn" class="btn ml-2 btnProcess" (click)="fileProcess()" data-toggle="modal" data-target="#exampleModalCenter">
+                            <i class="fas fa-file-alt mr-1"></i> Process</button>
+                    <small class="d-flex justify-content-center unsupported" *ngIf="!supportedFileFormat">Unsupported file format</small>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -37,7 +34,7 @@
     </div>
 </div>
 
-<div class="container d-flex justify-content-center mt-5 userInformation" *ngIf="displayUserInfo">
+<!-- <div class="container d-flex justify-content-center mt-5 userInformation" *ngIf="displayUserInfo">
     <div class="row ml-4">
         <div class="col-sm-12">
             <div class="media bg-light">
@@ -61,6 +58,40 @@
                             If the records gets failed (a record is considered as 'failed' if end balance is not calculated properly or if the transaction reference is not unique), you get failure alert along with a CSV file which contains the failed records.
                         </li>
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="container" *ngIf="displayUserInfo">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                        <div class="media bg-light">
+                            <img src="../../assets/icon/info-user.png" class="user-image align-self-start mr-3 m-4" alt="User Info">
+                            <div class="media-body m-4">
+                                <h5 class="mt-0">Steps to use this application</h5>
+                                <ul>
+                                    <li class="mt-2">
+                                        Select a CSV/XML file using choose file button.
+                                    </li>
+                                    <li class="mt-2">
+                                        Once the CSV/XML file is loaded successfully, the data file will be displayed in a tablular column.
+                                    </li>
+                                    <li class="mt-2">
+                                        Click on Process button to process the records.
+                                    </li>
+                                    <li class="mt-2">
+                                        If the records get successfully processed, you get success alert.
+                                    </li>
+                                    <li class="mt-2">
+                                        If the records gets failed (a record is considered as 'failed' if end balance is not calculated properly or if the transaction reference is not unique), you get failure alert along with a CSV file which contains the failed records.
+                                    </li>
+                                </ul>
+                            </div>
+                            </div>
                 </div>
             </div>
         </div>
@@ -92,21 +123,20 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-sm-12">
-            <table class="table data-table">
-                <thead class="tableHeader">
-                    <tr>
-                        <th scope="col" *ngFor="let header of headersRow;let i=index">{{header}}</th>
-                    </tr>
-                </thead>
-                <tbody class="tableBody">
-                    <tr *ngFor="let rec of dataWithoutHeader;let i=index">
-                        <td *ngFor="let data of rec;let j=index">{{data}}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="table data-table">
+                    <thead class="tableHeader">
+                        <tr>
+                            <th scope="col" *ngFor="let header of headersRow;let i=index">{{header}}</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tableBody">
+                        <tr *ngFor="let rec of dataWithoutHeader;let i=index">
+                            <td *ngFor="let data of rec;let j=index">{{data}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-<!-- <footer class="footer d-flex justify-content-center footerBottom">
-  <p class="footerBody">&copy; CSV/XML Parser and Reporter</p>
-</footer>  -->
