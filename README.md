@@ -31,7 +31,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 
 ## How to use the application
-1. Select a CSV/XML file using choose file button.
+1. Select a CSV/XML file using choose file button (Files available in resources folder) .
 2. Once the CSV/XML file is loaded successfully, the data file will be displayed in a tabular column.
 3. Click on Process button to process the records.
 4. If the records get successfully processed, you get success alert.
